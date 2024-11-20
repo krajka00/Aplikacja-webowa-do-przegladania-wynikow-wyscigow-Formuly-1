@@ -62,10 +62,8 @@ class CurrentStandingsView(APIView):
 
     def get(self, request):
         try:
-            # Znalezienie najnowszego wyścigu
+
             latest_race = Race.objects.latest('date')
-            
-            # Pobranie tabeli kierowców po najnowszym wyścigu
             driver_standings = DriverStanding.objects.filter(race=latest_race).order_by('position')
             driver_data = [
                 {
@@ -75,8 +73,6 @@ class CurrentStandingsView(APIView):
                 }
                 for standing in driver_standings
             ]
-            
-            # Pobranie tabeli konstruktorów po najnowszym wyścigu
             constructor_standings = ConstructorStanding.objects.filter(race=latest_race).order_by('position')
             constructor_data = [
                 {
@@ -87,7 +83,6 @@ class CurrentStandingsView(APIView):
                 for standing in constructor_standings
             ]
             
-            # Zwrócenie odpowiedzi zawierającej dane kierowców i konstruktorów
             return Response({
                 'latest_race': latest_race.official_name,
                 'driver_standings': driver_data,
@@ -96,7 +91,6 @@ class CurrentStandingsView(APIView):
         except Race.DoesNotExist:
             return Response({'detail': 'No race data available.'}, status=status.HTTP_404_NOT_FOUND)
 
-# Widok do szczegółów danego wyścigu (w tym statystyki)
 class RaceDetailsView(APIView):
     permission_classes = []
 
@@ -104,7 +98,6 @@ class RaceDetailsView(APIView):
         try:
             race = Race.objects.get(pk=race_id)
             
-            # Szczegółowe dane wyścigu
             race_details = {
                 'official_name': race.official_name,
                 'season': race.season,
@@ -116,7 +109,7 @@ class RaceDetailsView(APIView):
                 'course_length': race.course_length
             }
             
-            # Pobranie wyników wyścigu
+
             race_results = race.raceresult_set.all().order_by('position')
             results_data = [
                 {
@@ -132,7 +125,6 @@ class RaceDetailsView(APIView):
                 for result in race_results
             ]
             
-            # Pobranie najszybszych okrążeń
             fastest_laps = FastestLap.objects.filter(race=race).order_by('lap')
             fastest_laps_data = [
                 {
@@ -146,7 +138,6 @@ class RaceDetailsView(APIView):
                 for lap in fastest_laps
             ]
             
-            # Pobranie pit stopów
             pit_stops = PitStop.objects.filter(race=race).order_by('stop_number')
             pit_stops_data = [
                 {
@@ -159,7 +150,6 @@ class RaceDetailsView(APIView):
                 for stop in pit_stops
             ]
             
-            # Pobranie wyników kwalifikacji
             qualifying_results = QualifyingResult.objects.filter(race=race).order_by('position')
             qualifying_data = [
                 {
@@ -176,7 +166,6 @@ class RaceDetailsView(APIView):
                 for result in qualifying_results
             ]
 
-            # Pobranie wyników kwalifikacji do sprintu (jeśli istnieją)
             sprint_qualifying_results = SprintQualifyingResult.objects.filter(race=race).order_by('position')
             sprint_qualifying_data = [
                 {
@@ -193,7 +182,6 @@ class RaceDetailsView(APIView):
                 for result in sprint_qualifying_results
             ]
             
-            # Pobranie wyników sprintu
             sprint_results = SprintRaceResult.objects.filter(race=race).order_by('position')
             sprint_results_data = [
                 {
@@ -211,7 +199,6 @@ class RaceDetailsView(APIView):
                 for result in sprint_results
             ]
 
-            # Pobranie wyników treningów (jeśli istnieją)
             practice_sessions = PracticeSession.objects.filter(race=race).order_by('session_number', 'position')
             practice_sessions_data = [
                 {

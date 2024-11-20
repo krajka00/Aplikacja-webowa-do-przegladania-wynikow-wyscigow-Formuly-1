@@ -13,11 +13,10 @@ def replace_dash_with_space_in_lines_with_id(file_path):
     modified_lines = []
     for line in lines:
         if "Id" in line:
-            modified_lines.append(line.replace('-', ' ', 1))  # Zastępujemy pierwszy myślnik spacją, jeśli występuje na początku
+            modified_lines.append(line.replace('-', ' ', 1))
         else:
             modified_lines.append(line)
 
-    # Zapisanie zmodyfikowanej zawartości do pliku
     with open(file_path, 'w') as file:
         file.writelines(modified_lines)
 
