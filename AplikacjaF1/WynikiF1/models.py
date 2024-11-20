@@ -1,4 +1,14 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+class Comment(models.Model):
+    race = models.ForeignKey('Race', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.race.official_name} - {self.timestamp}"
 
 class Continent(models.Model):
     code = models.CharField(max_length=10)
@@ -49,7 +59,6 @@ class Circuit(models.Model):
 class Driver(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    full_name = models.CharField(max_length=200)
     abbreviation = models.CharField(max_length=10)
     permanent_number = models.IntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10)
@@ -60,7 +69,7 @@ class Driver(models.Model):
     nationality = models.ForeignKey(Country, related_name='nationality', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.full_name
+        return f"{self.first_name} {self.last_name}"
 
 class EngineManufacturer(models.Model):
     name = models.CharField(max_length=100)
@@ -100,7 +109,6 @@ class Race(models.Model):
     official_name = models.CharField(max_length=200)
     qualifying_format = models.CharField(max_length=50)
     circuit = models.ForeignKey(Circuit, on_delete=models.CASCADE)
-    circuit_type = models.CharField(max_length=50)
     course_length = models.FloatField()
     laps = models.IntegerField()
     distance = models.FloatField()
