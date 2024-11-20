@@ -62,8 +62,8 @@ class CurrentStandingsView(APIView):
 
     def get(self, request):
         try:
+
             latest_race = Race.objects.latest('date')
-            
             driver_standings = DriverStanding.objects.filter(race=latest_race).order_by('position')
             driver_data = [
                 {
@@ -73,7 +73,6 @@ class CurrentStandingsView(APIView):
                 }
                 for standing in driver_standings
             ]
-            
             constructor_standings = ConstructorStanding.objects.filter(race=latest_race).order_by('position')
             constructor_data = [
                 {
@@ -110,6 +109,7 @@ class RaceDetailsView(APIView):
                 'course_length': race.course_length
             }
             
+
             race_results = race.raceresult_set.all().order_by('position')
             results_data = [
                 {

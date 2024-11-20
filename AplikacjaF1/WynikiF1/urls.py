@@ -13,6 +13,7 @@ urlpatterns = [
     path('races/<int:race_id>/', RaceDetailsView.as_view(), name='race_details'),
 
     # FastestLap endpoints
+
     path('fastest-lap/update/<int:pk>/', FastestLapUpdateView.as_view(), name='fastest_lap_update'),
     path('fastest-lap/create/', FastestLapCreateView.as_view(), name='fastest_lap_create'),
     path('fastest-lap/delete/<int:pk>/', FastestLapDeleteView.as_view(), name='fastest_lap_delete'),
