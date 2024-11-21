@@ -227,6 +227,23 @@ class RaceDetailsView(APIView):
         except Race.DoesNotExist:
             return Response({'detail': 'Race not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+class RaceListView(APIView):
+    permission_classes = []
+
+    def get(self, request, year):
+        races = Race.objects.filter(season=year).order_by('date')
+        race_data = [
+            {
+                'id': race.pk,
+                'official_name': race.official_name,
+                'season': race.season,
+                'round': race.round,
+                'date': race.date
+            }
+            for race in races
+        ]
+        return Response(race_data, status=status.HTTP_200_OK)
+
 class FastestLapCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = FastestLap.objects.all()
