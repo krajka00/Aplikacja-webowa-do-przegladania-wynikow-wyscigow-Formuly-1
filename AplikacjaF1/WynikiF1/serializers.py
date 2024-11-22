@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Comment
 from WynikiF1.models import DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, SprintQualifyingResult, SprintRaceResult, PracticeSession
+from django.contrib.auth.models import Group
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -17,13 +18,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.save()
+
+        user_group = Group.objects.get(name='User')
+        user.groups.add(user_group)
+
         return user
 
 class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    race = serializers.PrimaryKeyRelatedField(read_only=True)  # Pole jest tylko do odczytu
+
     class Meta:
         model = Comment
-        fields = ['id', 'race', 'user', 'content', 'timestamp']
-        read_only_fields = ['user', 'timestamp']
+        fields = ['id', 'race', 'user', 'content', 'timestamp', 'username']
+        read_only_fields = ['user', 'timestamp', 'username', 'race']
 
 class DriverStandingSerializer(serializers.ModelSerializer):
     class Meta:

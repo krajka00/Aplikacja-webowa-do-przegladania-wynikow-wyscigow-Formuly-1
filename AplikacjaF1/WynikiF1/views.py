@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status, generics, serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import UpdateAPIView, CreateAPIView, DestroyAPIView
@@ -35,6 +35,17 @@ class LogoutView(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+class CommentForRaceView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, race_id):
+        try:
+            race = Race.objects.get(pk=race_id)
+            comments = Comment.objects.filter(race=race)
+            serializer = CommentSerializer(comments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Race.DoesNotExist:
+            return Response({'detail': 'Race not found.'}, status=status.HTTP_404_NOT_FOUND)
 class CommentCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Comment.objects.all()
@@ -46,16 +57,29 @@ class CommentCreateView(CreateAPIView):
             return super().get_permissions()
         self.permission_denied(self.request, message="Only users with 'User' role can add comments.")
 
+    def perform_create(self, serializer):
+        race_id = self.kwargs.get('race_id')
+        try:
+            race = Race.objects.get(pk=race_id)
+        except Race.DoesNotExist:
+            raise serializers.ValidationError({"race": ["Race with this ID does not exist."]})
+
+        serializer.save(user=self.request.user, race=race)
+
 class CommentDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def get_queryset(self):
         user = self.request.user
+        race_id = self.kwargs['race_id']
+        
         if user.groups.filter(name='Moderator').exists() or user.is_staff:
-            return Comment.objects.all()
-        return Comment.objects.filter(user=user)
+            return Comment.objects.filter(race_id=race_id)
+        
+        # Użytkownik może usunąć tylko swoje komentarze w danym wyścigu
+        return Comment.objects.filter(user=user, race_id=race_id)
 
 class CurrentStandingsView(APIView):
     permission_classes = []

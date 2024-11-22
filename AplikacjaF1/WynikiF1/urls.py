@@ -4,7 +4,7 @@ from .views import(UserRegistrationView, LogoutView, CurrentStandingsView, RaceD
                    QualifyingResultDeleteView, SprintQualifyingResultUpdateView, SprintQualifyingResultCreateView, SprintQualifyingResultDeleteView, SprintRaceResultUpdateView,
                    SprintRaceResultCreateView, SprintRaceResultDeleteView, PracticeSessionUpdateView, PracticeSessionCreateView, PracticeSessionDeleteView, RaceUpdateView, RaceCreateView,
                    RaceDeleteView, DriverStandingUpdateView, DriverStandingCreateView, DriverStandingDeleteView, ConstructorStandingUpdateView, ConstructorStandingCreateView,
-                   ConstructorStandingDeleteView, CommentCreateView, CommentDeleteView, RaceListView
+                   ConstructorStandingDeleteView, CommentForRaceView,CommentCreateView, CommentDeleteView, RaceListView
 )
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),
@@ -12,6 +12,9 @@ urlpatterns = [
     path('standings/current/', CurrentStandingsView.as_view(), name='current_standings'),
     path('races/<int:race_id>/', RaceDetailsView.as_view(), name='race_details'),
     path('races/all/<int:year>/', RaceListView.as_view(), name='race_list'),
+    path('races/<int:race_id>/comments/', CommentForRaceView.as_view(), name='race_comments'),
+    path('races/<int:race_id>/comments/create/', CommentCreateView.as_view(), name='comment_create'),
+    path('races/<int:race_id>/comments/delete/<int:pk>/', CommentDeleteView.as_view(), name='comment_delete'),
 
     # FastestLap endpoints
 
