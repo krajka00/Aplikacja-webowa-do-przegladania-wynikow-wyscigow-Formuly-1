@@ -40,7 +40,7 @@ const HomePage = () => {
         <h1>Lista Wyścigów 2023</h1>
         <div className="races-grid">
           {races.map((race) => (
-            <Link to={`/race/${race.id}`} key={race.id} className="race-card-link">
+            <Link to={`/races/${race.id}`} key={race.id} className="race-card-link">
               <div className="race-card">
                 <h2>{race.official_name}</h2>
                 <p>Data: {race.date}</p>
