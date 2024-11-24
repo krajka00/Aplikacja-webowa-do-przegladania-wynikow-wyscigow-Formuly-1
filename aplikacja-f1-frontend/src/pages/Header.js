@@ -3,11 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ updateIsAdmin }) => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
@@ -15,12 +14,14 @@ const Header = () => {
       setIsLoggedIn(true);
       const isSuperuser = localStorage.getItem('is_admin') === 'true';
       setIsAdmin(isSuperuser);
+      if (updateIsAdmin) {
+        updateIsAdmin(isSuperuser);
+      }
     } else {
       setIsLoggedIn(false);
       setIsAdmin(false);
     }
-    setLoading(false);
-  }, []);
+  }, [updateIsAdmin]);
 
   const handleLogout = async () => {
     try {
@@ -43,13 +44,12 @@ const Header = () => {
       localStorage.clear();
       setIsLoggedIn(false);
       setIsAdmin(false);
+      if (updateIsAdmin) {
+        updateIsAdmin(false);
+      }
       navigate('/');
     }
   };
-
-  if (loading) {
-    return null;
-  }
 
   return (
     <header className="header">

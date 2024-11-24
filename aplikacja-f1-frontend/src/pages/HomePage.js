@@ -7,6 +7,7 @@ import './HomePage.css';
 const HomePage = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [races, setRaces] = useState([]);
   const [driverStandings, setDriverStandings] = useState([]);
   const [constructorStandings, setConstructorStandings] = useState([]);
@@ -28,16 +29,20 @@ const HomePage = () => {
           setIsLoggedIn(true);
           if (response.data.is_superuser) {
             localStorage.setItem('is_admin', 'true');
+            setIsAdmin(true);
           } else {
             localStorage.setItem('is_admin', 'false');
+            setIsAdmin(false);
           }
         } catch (error) {
           console.error('Token verification failed.', error);
           setIsLoggedIn(false);
+          setIsAdmin(false);
           localStorage.removeItem('is_admin');
         }
       } else {
         setIsLoggedIn(false);
+        setIsAdmin(false);
         localStorage.removeItem('is_admin');
       }
     };
@@ -71,7 +76,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <Header isLoggedIn={isLoggedIn} />
+      <Header updateIsAdmin={(isAdmin) => setIsAdmin(isAdmin)} />
       <div className="races-container" style={{ paddingTop: '80px' }}>
         <h1>Lista Wyścigów 2023</h1>
         <div className="races-grid">
