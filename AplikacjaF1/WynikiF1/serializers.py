@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Comment
-from WynikiF1.models import DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, SprintQualifyingResult, SprintRaceResult, PracticeSession
+from WynikiF1.models import (DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, SprintQualifyingResult, SprintRaceResult, PracticeSession,
+ Comment, Continent, Country, Constructor, Chassis, Circuit, Driver, EngineManufacturer, Engine, Entrant, TyreManufacturer, RaceResult,
+    StartingGrid, SprintStartingGrid)
 from django.contrib.auth.models import Group
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -26,7 +28,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
-    race = serializers.PrimaryKeyRelatedField(read_only=True)  # Pole jest tylko do odczytu
+    race = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comment
@@ -77,3 +79,63 @@ class PracticeSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PracticeSession
         fields = ['id', 'race', 'session_number', 'driver', 'constructor', 'position', 'laps', 'time', 'gap', 'interval']
+
+class ContinentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Continent
+        fields = ['id', 'code', 'name', 'demonym']
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['id', 'name', 'alpha2_code', 'alpha3_code', 'demonym', 'continent']
+
+class ConstructorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Constructor
+        fields = ['id', 'name', 'full_name', 'country']
+
+class ChassisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chassis
+        fields = ['id', 'name', 'full_name', 'constructor']
+
+class CircuitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Circuit
+        fields = ['id', 'name', 'full_name', 'circuit_type', 'place_name', 'country', 'latitude', 'longitude']
+
+class DriverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = ['id', 'first_name', 'last_name', 'abbreviation', 'permanent_number', 'gender', 'date_of_birth', 'date_of_death', 'place_of_birth', 'country_of_birth', 'nationality']
+
+class EngineManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EngineManufacturer
+        fields = ['id', 'name', 'country']
+
+class EngineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Engine
+        fields = ['id', 'name', 'full_name', 'manufacturer', 'capacity', 'configuration', 'aspiration']
+
+class EntrantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entrant
+        fields = ['id', 'name']
+
+class TyreManufacturerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TyreManufacturer
+        fields = ['id', 'name', 'country']
+
+class RaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Race
+        fields = ['id', 'season', 'round', 'date', 'official_name', 'qualifying_format', 'circuit', 'course_length', 'laps', 'distance']
+
+class RaceResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RaceResult
+        fields = ['id', 'race', 'driver', 'constructor', 'position', 'points', 'laps', 'time', 'time_penalty', 'gap', 'interval', 'reason_retired']

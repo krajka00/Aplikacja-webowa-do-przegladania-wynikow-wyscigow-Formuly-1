@@ -12,6 +12,7 @@ const RacePage = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const fetchRaceDetails = async () => {
@@ -228,7 +229,6 @@ const RacePage = () => {
                 <thead>
                   <tr>
                     <th>Kierowca</th>
-                    <th>Konstruktor</th>
                     <th>Okrążenie</th>
                     <th>Czas Okrążenia</th>
                     <th>Strata</th>
@@ -245,7 +245,6 @@ const RacePage = () => {
                   .map((lap, index) => (
                     <tr key={index}>
                       <td>{lap.driver}</td>
-                      <td>{lap.constructor}</td>
                       <td>{lap.lap}</td>
                       <td>{lap.lap_time}</td>
                       <td>{lap.gap}</td>

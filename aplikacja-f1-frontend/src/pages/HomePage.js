@@ -1,13 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import './HomePage.css';
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [races, setRaces] = useState([]);
   const [driverStandings, setDriverStandings] = useState([]);
   const [constructorStandings, setConstructorStandings] = useState([]);
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const accessToken = localStorage.getItem('access_token');
+      if (accessToken) {
+        try {
+          const response = await axios.post(
+            'http://127.0.0.1:8000/api/token/verify/',
+            { token: accessToken },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          setIsLoggedIn(true);
+          if (response.data.is_superuser) {
+            localStorage.setItem('is_admin', 'true');
+          } else {
+            localStorage.setItem('is_admin', 'false');
+          }
+        } catch (error) {
+          console.error('Token verification failed.', error);
+          setIsLoggedIn(false);
+          localStorage.removeItem('is_admin');
+        }
+      } else {
+        setIsLoggedIn(false);
+        localStorage.removeItem('is_admin');
+      }
+    };
+
+    verifyToken();
+  }, []);
 
   useEffect(() => {
     const fetchRaces = async () => {
@@ -35,7 +71,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
       <div className="races-container" style={{ paddingTop: '80px' }}>
         <h1>Lista Wyścigów 2023</h1>
         <div className="races-grid">
@@ -66,7 +102,11 @@ const HomePage = () => {
                 {driverStandings.map((standing, index) => (
                   <tr key={index}>
                     <td>{standing.position}</td>
-                    <td>{standing.driver}</td>
+                    <td>
+                      <Link to={`/drivers/${standing.driver_id}`} className="driver-link">
+                        {standing.driver}
+                      </Link>
+                    </td>
                     <td>{standing.points}</td>
                   </tr>
                 ))}
@@ -89,7 +129,11 @@ const HomePage = () => {
                 {constructorStandings.map((standing, index) => (
                   <tr key={index}>
                     <td>{standing.position}</td>
-                    <td>{standing.constructor}</td>
+                    <td>
+                      <Link to={`/constructors/${standing.constructor_id}`} className="constructor-link">
+                        {standing.constructor}
+                      </Link>
+                    </td>
                     <td>{standing.points}</td>
                   </tr>
                 ))}

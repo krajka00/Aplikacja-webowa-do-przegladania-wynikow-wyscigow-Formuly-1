@@ -1,16 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Header.css';
 
 const Header = () => {
   const navigate = useNavigate();
-  const isLoggedIn = Boolean(localStorage.getItem('access_token'));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+      setIsLoggedIn(true);
+      const isSuperuser = localStorage.getItem('is_admin') === 'true';
+      setIsAdmin(isSuperuser);
+    } else {
+      setIsLoggedIn(false);
+      setIsAdmin(false);
+    }
+    setLoading(false);
+  }, []);
 
   const handleLogout = async () => {
     try {
       const refreshToken = localStorage.getItem('refresh_token');
-      
       if (refreshToken) {
         await axios.post(
           'http://127.0.0.1:8000/api/logout/',
@@ -23,15 +37,19 @@ const Header = () => {
           }
         );
       }
-
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-
-      navigate('/');
     } catch (error) {
       console.error('Logout failed', error);
+    } finally {
+      localStorage.clear();
+      setIsLoggedIn(false);
+      setIsAdmin(false);
+      navigate('/');
     }
   };
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <header className="header">
@@ -41,12 +59,17 @@ const Header = () => {
         </Link>
       </div>
       <div className="login-link">
+        {isLoggedIn && isAdmin && (
+          <Link to="/admin" className="admin-button">
+            Zarządzaj
+          </Link>
+        )}
         {isLoggedIn ? (
-          <button onClick={handleLogout} className="login-button">
+          <button onClick={handleLogout} className="login-button1">
             Wyloguj
           </button>
         ) : (
-          <Link to="/login" className="login-button">
+          <Link to="/login" className="login-button1">
             Zaloguj
           </Link>
         )}

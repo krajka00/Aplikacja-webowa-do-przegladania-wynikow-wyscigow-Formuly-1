@@ -1,15 +1,24 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, generics, serializers
+from rest_framework import status, generics, serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.generics import UpdateAPIView, CreateAPIView, DestroyAPIView
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework.generics import UpdateAPIView, CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.authentication import BasicAuthentication
+from django.contrib.auth.models import User
+
 from .serializers import UserRegistrationSerializer, CommentSerializer
-from .models import Comment
+from .models import (Comment, Continent, Country, Constructor, Chassis, Circuit, Driver,
+                    EngineManufacturer, Engine, Entrant, TyreManufacturer, Race, RaceResult,
+                    StartingGrid, DriverStanding, ConstructorStanding, FastestLap, PitStop,
+                    PracticeSession, SprintQualifyingResult, SprintRaceResult, SprintStartingGrid,
+                    QualifyingResult
+)
 from WynikiF1.models import DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, PracticeSession, SprintRaceResult, SprintQualifyingResult, SprintRaceResult, PracticeSession
 from WynikiF1.serializers import(DriverStandingSerializer, ConstructorStandingSerializer, RaceSerializer,
-                                FastestLapSerializer, PitStopSerializer, QualifyingResultSerializer,
-                                SprintQualifyingResultSerializer, SprintRaceResultSerializer, PracticeSessionSerializer
+                                FastestLapSerializer, PitStopSerializer, QualifyingResultSerializer, SprintQualifyingResultSerializer, SprintRaceResultSerializer, PracticeSessionSerializer,
+                                ContinentSerializer, CountrySerializer, ConstructorSerializer, ChassisSerializer, CircuitSerializer, DriverSerializer,
+                                EngineManufacturerSerializer, EngineSerializer, EntrantSerializer, TyreManufacturerSerializer, RaceResultSerializer,
 )
 from django.urls import path
 
@@ -34,6 +43,23 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class CustomTokenVerifyView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            token = request.data.get('token')
+            decoded_token = AccessToken(token)
+            user_id = decoded_token['user_id']
+
+            user = User.objects.get(id=user_id)
+            return Response({
+                'is_superuser': user.is_superuser,
+            }, status=status.HTTP_200_OK)
+
+        except Exception:
+            return Response({'detail': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class CommentForRaceView(APIView):
     permission_classes = [AllowAny]
@@ -78,20 +104,18 @@ class CommentDeleteView(DestroyAPIView):
         if user.groups.filter(name='Moderator').exists() or user.is_staff:
             return Comment.objects.filter(race_id=race_id)
         
-        # Użytkownik może usunąć tylko swoje komentarze w danym wyścigu
         return Comment.objects.filter(user=user, race_id=race_id)
-
 class CurrentStandingsView(APIView):
     permission_classes = []
 
     def get(self, request):
         try:
-
             latest_race = Race.objects.latest('date')
             driver_standings = DriverStanding.objects.filter(race=latest_race).order_by('position')
             driver_data = [
                 {
                     'driver': f"{standing.driver.first_name} {standing.driver.last_name}",
+                    'driver_id': standing.driver.id,
                     'position': standing.position,
                     'points': standing.points
                 }
@@ -101,12 +125,13 @@ class CurrentStandingsView(APIView):
             constructor_data = [
                 {
                     'constructor': standing.constructor.name,
+                    'constructor_id': standing.constructor.id,
                     'position': standing.position,
                     'points': standing.points
                 }
                 for standing in constructor_standings
             ]
-            
+
             return Response({
                 'latest_race': latest_race.official_name,
                 'driver_standings': driver_data,
@@ -115,9 +140,10 @@ class CurrentStandingsView(APIView):
         except Race.DoesNotExist:
             return Response({'detail': 'No race data available.'}, status=status.HTTP_404_NOT_FOUND)
 
-class RaceDetailsView(APIView):
-    permission_classes = []
 
+class RaceDetailsView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
     def get(self, request, race_id):
         try:
             race = Race.objects.get(pk=race_id)
@@ -268,15 +294,118 @@ class RaceListView(APIView):
         ]
         return Response(race_data, status=status.HTTP_200_OK)
 
+class FastestLapListView(ListAPIView):
+    serializer_class = FastestLapSerializer
+
+    def get_queryset(self):
+        queryset = FastestLap.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
+
+class PitStopListView(ListAPIView):
+    serializer_class = PitStopSerializer
+
+    def get_queryset(self):
+        queryset = PitStop.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        return queryset
+
+class QualifyingResultListView(ListAPIView):
+    serializer_class = QualifyingResultSerializer
+
+    def get_queryset(self):
+        queryset = QualifyingResult.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
+
+class SprintQualifyingResultListView(ListAPIView):
+    serializer_class = SprintQualifyingResultSerializer
+
+    def get_queryset(self):
+        queryset = SprintQualifyingResult.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
+
+class SprintRaceResultListView(ListAPIView):
+    serializer_class = SprintRaceResultSerializer
+
+    def get_queryset(self):
+        queryset = SprintRaceResult.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
+
+class PracticeSessionListView(ListAPIView):
+    serializer_class = PracticeSessionSerializer
+
+    def get_queryset(self):
+        queryset = PracticeSession.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
+
 class FastestLapCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
 class FastestLapUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class FastestLapDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -284,14 +413,22 @@ class FastestLapDeleteView(DestroyAPIView):
     serializer_class = FastestLapSerializer
 
 class PitStopCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = PitStop.objects.all()
     serializer_class = PitStopSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        serializer.save(race_id=race, driver_id=driver)
+
 class PitStopUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = PitStop.objects.all()
     serializer_class = PitStopSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        serializer.save(race_id=race, driver_id=driver)
 
 class PitStopDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -299,14 +436,24 @@ class PitStopDeleteView(DestroyAPIView):
     serializer_class = PitStopSerializer
 
 class QualifyingResultCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = QualifyingResult.objects.all()
     serializer_class = QualifyingResultSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
 class QualifyingResultUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = QualifyingResult.objects.all()
     serializer_class = QualifyingResultSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class QualifyingResultDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -314,14 +461,24 @@ class QualifyingResultDeleteView(DestroyAPIView):
     serializer_class = QualifyingResultSerializer
 
 class SprintQualifyingResultCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintQualifyingResult.objects.all()
     serializer_class = SprintQualifyingResultSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
 class SprintQualifyingResultUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintQualifyingResult.objects.all()
     serializer_class = SprintQualifyingResultSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class SprintQualifyingResultDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -329,14 +486,24 @@ class SprintQualifyingResultDeleteView(DestroyAPIView):
     serializer_class = SprintQualifyingResultSerializer
 
 class SprintRaceResultCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintRaceResult.objects.all()
     serializer_class = SprintRaceResultSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
 class SprintRaceResultUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintRaceResult.objects.all()
     serializer_class = SprintRaceResultSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class SprintRaceResultDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -344,14 +511,24 @@ class SprintRaceResultDeleteView(DestroyAPIView):
     serializer_class = SprintRaceResultSerializer
 
 class PracticeSessionCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = PracticeSession.objects.all()
     serializer_class = PracticeSessionSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
 class PracticeSessionUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = PracticeSession.objects.all()
     serializer_class = PracticeSessionSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class PracticeSessionDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -374,14 +551,22 @@ class RaceDeleteView(DestroyAPIView):
     serializer_class = RaceSerializer
 
 class DriverStandingCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = DriverStanding.objects.all()
     serializer_class = DriverStandingSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        serializer.save(race_id=race, driver_id=driver)
+
 class DriverStandingUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = DriverStanding.objects.all()
     serializer_class = DriverStandingSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        serializer.save(race_id=race, driver_id=driver)
 
 class DriverStandingDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -389,16 +574,440 @@ class DriverStandingDeleteView(DestroyAPIView):
     serializer_class = DriverStandingSerializer
 
 class ConstructorStandingCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = ConstructorStanding.objects.all()
     serializer_class = ConstructorStandingSerializer
 
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, constructor_id=constructor)
+
 class ConstructorStandingUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = ConstructorStanding.objects.all()
     serializer_class = ConstructorStandingSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, constructor_id=constructor)
+
+class ConstructorStandingListView(ListAPIView):
+    serializer_class = ConstructorStandingSerializer
+
+    def get_queryset(self):
+        queryset = ConstructorStanding.objects.all()
+        race = self.request.query_params.get('race')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
 
 class ConstructorStandingDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = ConstructorStanding.objects.all()
     serializer_class = ConstructorStandingSerializer
+
+class ContinentCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Continent.objects.all()
+    serializer_class = ContinentSerializer
+
+class ContinentUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Continent.objects.all()
+    serializer_class = ContinentSerializer
+
+class ContinentDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Continent.objects.all()
+    serializer_class = ContinentSerializer
+
+class ContinentRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Continent.objects.all()
+    serializer_class = ContinentSerializer
+
+class ContinentListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Continent.objects.all()
+    serializer_class = ContinentSerializer
+
+class CountryCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+class CountryUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+class CountryDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+class CountryRetrieveView(RetrieveAPIView):
+    permission_classes = []
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+class CountryListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+class ConstructorCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Constructor.objects.all()
+    serializer_class = ConstructorSerializer
+
+class ConstructorUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Constructor.objects.all()
+    serializer_class = ConstructorSerializer
+
+class ConstructorDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Constructor.objects.all()
+    serializer_class = ConstructorSerializer
+
+class ConstructorRetrieveView(RetrieveAPIView):
+    permission_classes = []
+    queryset = Constructor.objects.all()
+    serializer_class = ConstructorSerializer
+
+class ConstructorListView(ListAPIView):
+    permission_classes = []
+    queryset = Constructor.objects.all()
+    serializer_class = ConstructorSerializer
+
+class ChassisCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Chassis.objects.all()
+    serializer_class = ChassisSerializer
+
+class ChassisUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Chassis.objects.all()
+    serializer_class = ChassisSerializer
+
+class ChassisDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Chassis.objects.all()
+    serializer_class = ChassisSerializer
+
+class ChassisRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Chassis.objects.all()
+    serializer_class = ChassisSerializer
+
+class ChassisListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Chassis.objects.all()
+    serializer_class = ChassisSerializer
+
+class CircuitCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Circuit.objects.all()
+    serializer_class = CircuitSerializer
+
+class CircuitUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Circuit.objects.all()
+    serializer_class = CircuitSerializer
+
+class CircuitDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Circuit.objects.all()
+    serializer_class = CircuitSerializer
+
+class CircuitRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Circuit.objects.all()
+    serializer_class = CircuitSerializer
+
+class CircuitListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Circuit.objects.all()
+    serializer_class = CircuitSerializer
+
+class DriverCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+
+class DriverUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+
+class DriverDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+
+class DriverRetrieveView(RetrieveAPIView):
+    permission_classes = []
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+
+class DriverListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+
+class EngineManufacturerCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = EngineManufacturer.objects.all()
+    serializer_class = EngineManufacturerSerializer
+
+class EngineManufacturerUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = EngineManufacturer.objects.all()
+    serializer_class = EngineManufacturerSerializer
+
+class EngineManufacturerDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = EngineManufacturer.objects.all()
+    serializer_class = EngineManufacturerSerializer
+
+class EngineManufacturerRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = EngineManufacturer.objects.all()
+    serializer_class = EngineManufacturerSerializer
+
+class EngineManufacturerListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = EngineManufacturer.objects.all()
+    serializer_class = EngineManufacturerSerializer
+
+class EngineCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Engine.objects.all()
+    serializer_class = EngineSerializer
+
+class EngineUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Engine.objects.all()
+    serializer_class = EngineSerializer
+
+class EngineDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Engine.objects.all()
+    serializer_class = EngineSerializer
+
+class EngineRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Engine.objects.all()
+    serializer_class = EngineSerializer
+
+class EngineListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Engine.objects.all()
+    serializer_class = EngineSerializer
+
+class EntrantCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Entrant.objects.all()
+    serializer_class = EntrantSerializer
+
+class EntrantUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Entrant.objects.all()
+    serializer_class = EntrantSerializer
+
+class EntrantDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Entrant.objects.all()
+    serializer_class = EntrantSerializer
+
+class EntrantRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Entrant.objects.all()
+    serializer_class = EntrantSerializer
+
+class EntrantListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Entrant.objects.all()
+    serializer_class = EntrantSerializer
+
+class TyreManufacturerCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = TyreManufacturer.objects.all()
+    serializer_class = TyreManufacturerSerializer
+
+class TyreManufacturerUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = TyreManufacturer.objects.all()
+    serializer_class = TyreManufacturerSerializer
+
+class TyreManufacturerDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = TyreManufacturer.objects.all()
+    serializer_class = TyreManufacturerSerializer
+
+class TyreManufacturerRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = TyreManufacturer.objects.all()
+    serializer_class = TyreManufacturerSerializer
+
+class TyreManufacturerListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = TyreManufacturer.objects.all()
+    serializer_class = TyreManufacturerSerializer
+
+class DriverStandingRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = DriverStanding.objects.all()
+    serializer_class = DriverStandingSerializer
+
+class DriverStandingListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = DriverStanding.objects.all()
+    serializer_class = DriverStandingSerializer
+
+class DriverStandingListView(ListAPIView):
+    serializer_class = DriverStandingSerializer
+
+    def get_queryset(self):
+        queryset = DriverStanding.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        return queryset
+
+class ConstructorStandingRetrieveView(RetrieveAPIView):
+    permission_classes = []
+    queryset = ConstructorStanding.objects.all()
+    serializer_class = ConstructorStandingSerializer
+
+class ConstructorStandingListView(ListAPIView):
+    permission_classes = []
+    queryset = ConstructorStanding.objects.all()
+    serializer_class = ConstructorStandingSerializer
+
+class RaceRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Race.objects.all()
+    serializer_class = RaceSerializer
+
+class RaceListView2(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Race.objects.all()
+    serializer_class = RaceSerializer
+
+class FastestLapRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = FastestLap.objects.all()
+    serializer_class = FastestLapSerializer
+
+# class FastestLapListView(ListAPIView):
+#     permission_classes = [IsAuthenticated]
+#     queryset = FastestLap.objects.all()
+#     serializer_class = FastestLapSerializer
+
+class PitStopRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PitStop.objects.all()
+    serializer_class = PitStopSerializer
+
+class PitStopListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PitStop.objects.all()
+    serializer_class = PitStopSerializer
+
+class QualifyingResultRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = QualifyingResult.objects.all()
+    serializer_class = QualifyingResultSerializer
+
+class QualifyingResultListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = QualifyingResult.objects.all()
+    serializer_class = QualifyingResultSerializer
+
+class SprintQualifyingResultRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = SprintQualifyingResult.objects.all()
+    serializer_class = SprintQualifyingResultSerializer
+
+class SprintQualifyingResultListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = SprintQualifyingResult.objects.all()
+    serializer_class = SprintQualifyingResultSerializer
+
+class SprintRaceResultRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = SprintRaceResult.objects.all()
+    serializer_class = SprintRaceResultSerializer
+
+class SprintRaceResultListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = SprintRaceResult.objects.all()
+    serializer_class = SprintRaceResultSerializer
+
+class PracticeSessionRetrieveView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PracticeSession.objects.all()
+    serializer_class = PracticeSessionSerializer
+
+class PracticeSessionListView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PracticeSession.objects.all()
+    serializer_class = PracticeSessionSerializer
+
+class RaceResultCreateView(CreateAPIView):
+    queryset = RaceResult.objects.all()
+    serializer_class = RaceResultSerializer
+
+    def perform_create(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
+class RaceResultUpdateView(UpdateAPIView):
+    queryset = RaceResult.objects.all()
+    serializer_class = RaceResultSerializer
+
+    def perform_update(self, serializer):
+        race = self.request.data.get('race')
+        driver = self.request.data.get('driver')
+        constructor = self.request.data.get('constructor')
+        serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
+
+class RaceResultListView(ListAPIView):
+    serializer_class = RaceResultSerializer
+
+    def get_queryset(self):
+        queryset = RaceResult.objects.all()
+        race = self.request.query_params.get('race')
+        driver = self.request.query_params.get('driver')
+        constructor = self.request.query_params.get('constructor')
+        if race:
+            queryset = queryset.filter(race_id=race)
+        if driver:
+            queryset = queryset.filter(driver_id=driver)
+        if constructor:
+            queryset = queryset.filter(constructor_id=constructor)
+        return queryset
+
+class ConstructorStandingAllView(ListAPIView):
+    serializer_class = ConstructorStandingSerializer
+
+    def get_queryset(self):
+        constructor_id = self.kwargs.get('constructor_id')
+        return ConstructorStanding.objects.filter(constructor_id=constructor_id).order_by('race__date')
+
+class DriverStandingAllView(ListAPIView):
+    serializer_class = DriverStandingSerializer
+
+    def get_queryset(self):
+        driver_id = self.kwargs.get('driver_id')
+        return DriverStanding.objects.filter(driver_id=driver_id).order_by('race__date')
