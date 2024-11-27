@@ -2,8 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Comment
 from WynikiF1.models import (DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, SprintQualifyingResult, SprintRaceResult, PracticeSession,
- Comment, Continent, Country, Constructor, Chassis, Circuit, Driver, EngineManufacturer, Engine, Entrant, TyreManufacturer, RaceResult,
-    StartingGrid, SprintStartingGrid)
+ Comment, Continent, Country, Constructor, Chassis, Circuit, Driver, RaceResult)
 from django.contrib.auth.models import Group
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -95,11 +94,6 @@ class ConstructorSerializer(serializers.ModelSerializer):
         model = Constructor
         fields = ['id', 'name', 'full_name', 'country']
 
-class ChassisSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Chassis
-        fields = ['id', 'name', 'full_name', 'constructor']
-
 class CircuitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Circuit
@@ -109,26 +103,6 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
         fields = ['id', 'first_name', 'last_name', 'abbreviation', 'permanent_number', 'gender', 'date_of_birth', 'date_of_death', 'place_of_birth', 'country_of_birth', 'nationality']
-
-class EngineManufacturerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EngineManufacturer
-        fields = ['id', 'name', 'country']
-
-class EngineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Engine
-        fields = ['id', 'name', 'full_name', 'manufacturer', 'capacity', 'configuration', 'aspiration']
-
-class EntrantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Entrant
-        fields = ['id', 'name']
-
-class TyreManufacturerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TyreManufacturer
-        fields = ['id', 'name', 'country']
 
 class RaceSerializer(serializers.ModelSerializer):
     class Meta:

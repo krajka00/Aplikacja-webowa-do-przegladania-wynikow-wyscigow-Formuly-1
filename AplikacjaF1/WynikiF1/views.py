@@ -9,16 +9,13 @@ from django.contrib.auth.models import User
 
 from .serializers import UserRegistrationSerializer, CommentSerializer
 from .models import (Comment, Continent, Country, Constructor, Chassis, Circuit, Driver,
-                    EngineManufacturer, Engine, Entrant, TyreManufacturer, Race, RaceResult,
-                    StartingGrid, DriverStanding, ConstructorStanding, FastestLap, PitStop,
-                    PracticeSession, SprintQualifyingResult, SprintRaceResult, SprintStartingGrid,
-                    QualifyingResult
+                    Race, RaceResult,DriverStanding, ConstructorStanding, FastestLap, PitStop,
+                    PracticeSession, SprintQualifyingResult, SprintRaceResult,QualifyingResult
 )
 from WynikiF1.models import DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, PracticeSession, SprintRaceResult, SprintQualifyingResult, SprintRaceResult, PracticeSession
 from WynikiF1.serializers import(DriverStandingSerializer, ConstructorStandingSerializer, RaceSerializer,
                                 FastestLapSerializer, PitStopSerializer, QualifyingResultSerializer, SprintQualifyingResultSerializer, SprintRaceResultSerializer, PracticeSessionSerializer,
-                                ContinentSerializer, CountrySerializer, ConstructorSerializer, ChassisSerializer, CircuitSerializer, DriverSerializer,
-                                EngineManufacturerSerializer, EngineSerializer, EntrantSerializer, TyreManufacturerSerializer, RaceResultSerializer,
+                                ContinentSerializer, CountrySerializer, ConstructorSerializer, CircuitSerializer, DriverSerializer, RaceResultSerializer,
 )
 from django.urls import path
 
@@ -684,31 +681,6 @@ class ConstructorListView(ListAPIView):
     queryset = Constructor.objects.all()
     serializer_class = ConstructorSerializer
 
-class ChassisCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Chassis.objects.all()
-    serializer_class = ChassisSerializer
-
-class ChassisUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Chassis.objects.all()
-    serializer_class = ChassisSerializer
-
-class ChassisDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Chassis.objects.all()
-    serializer_class = ChassisSerializer
-
-class ChassisRetrieveView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Chassis.objects.all()
-    serializer_class = ChassisSerializer
-
-class ChassisListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Chassis.objects.all()
-    serializer_class = ChassisSerializer
-
 class CircuitCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = Circuit.objects.all()
@@ -759,106 +731,6 @@ class DriverListView(ListAPIView):
     queryset = Driver.objects.all()
     serializer_class = DriverSerializer
 
-class EngineManufacturerCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = EngineManufacturer.objects.all()
-    serializer_class = EngineManufacturerSerializer
-
-class EngineManufacturerUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = EngineManufacturer.objects.all()
-    serializer_class = EngineManufacturerSerializer
-
-class EngineManufacturerDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = EngineManufacturer.objects.all()
-    serializer_class = EngineManufacturerSerializer
-
-class EngineManufacturerRetrieveView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = EngineManufacturer.objects.all()
-    serializer_class = EngineManufacturerSerializer
-
-class EngineManufacturerListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = EngineManufacturer.objects.all()
-    serializer_class = EngineManufacturerSerializer
-
-class EngineCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Engine.objects.all()
-    serializer_class = EngineSerializer
-
-class EngineUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Engine.objects.all()
-    serializer_class = EngineSerializer
-
-class EngineDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Engine.objects.all()
-    serializer_class = EngineSerializer
-
-class EngineRetrieveView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Engine.objects.all()
-    serializer_class = EngineSerializer
-
-class EngineListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Engine.objects.all()
-    serializer_class = EngineSerializer
-
-class EntrantCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Entrant.objects.all()
-    serializer_class = EntrantSerializer
-
-class EntrantUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Entrant.objects.all()
-    serializer_class = EntrantSerializer
-
-class EntrantDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = Entrant.objects.all()
-    serializer_class = EntrantSerializer
-
-class EntrantRetrieveView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Entrant.objects.all()
-    serializer_class = EntrantSerializer
-
-class EntrantListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Entrant.objects.all()
-    serializer_class = EntrantSerializer
-
-class TyreManufacturerCreateView(CreateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = TyreManufacturer.objects.all()
-    serializer_class = TyreManufacturerSerializer
-
-class TyreManufacturerUpdateView(UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = TyreManufacturer.objects.all()
-    serializer_class = TyreManufacturerSerializer
-
-class TyreManufacturerDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = TyreManufacturer.objects.all()
-    serializer_class = TyreManufacturerSerializer
-
-class TyreManufacturerRetrieveView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = TyreManufacturer.objects.all()
-    serializer_class = TyreManufacturerSerializer
-
-class TyreManufacturerListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = TyreManufacturer.objects.all()
-    serializer_class = TyreManufacturerSerializer
-
 class DriverStandingRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     queryset = DriverStanding.objects.all()
@@ -906,11 +778,6 @@ class FastestLapRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
-
-# class FastestLapListView(ListAPIView):
-#     permission_classes = [IsAuthenticated]
-#     queryset = FastestLap.objects.all()
-#     serializer_class = FastestLapSerializer
 
 class PitStopRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]

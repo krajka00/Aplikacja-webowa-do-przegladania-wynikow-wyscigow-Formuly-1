@@ -15,8 +15,7 @@ const ManagementPanel = () => {
   const [relatedData, setRelatedData] = useState({});
 
   const categories = [
-    'continent', 'country', 'constructor', 'chassis', 'circuit', 'driver', 'engine_manufacturer',
-    'engine', 'entrant', 'tyre_manufacturer', 'constructor_standing', 'driver_standing',
+    'continent', 'country', 'constructor', 'circuit', 'driver', 'constructor_standing', 'driver_standing',
     'race', 'race_result', 'fastest_lap', 'pit_stop', 'qualifying_result', 'sprint_qualifying_result',
     'sprint_race_result', 'practice_session'
   ];
@@ -88,12 +87,8 @@ const ManagementPanel = () => {
       continent: ['code', 'name', 'demonym'],
       country: ['name', 'alpha2_code', 'alpha3_code', 'demonym', 'continent'],
       constructor: ['name', 'full_name', 'country'],
-      chassis: ['name', 'full_name', 'constructor'],
       circuit: ['name', 'full_name', 'circuit_type', 'place_name', 'country', 'latitude', 'longitude'],
       driver: ['first_name', 'last_name', 'abbreviation', 'permanent_number', 'gender', 'date_of_birth', 'date_of_death', 'place_of_birth', 'country_of_birth', 'nationality'],
-      engine_manufacturer: ['name', 'country'],
-      engine: ['name', 'full_name', 'manufacturer', 'capacity', 'configuration', 'aspiration'],
-      entrant: ['name'],
       tyre_manufacturer: ['name', 'country'],
       constructor_standing: ['constructor', 'race', 'position', 'points'],
       driver_standing: ['driver', 'race', 'position', 'points'],
@@ -113,12 +108,8 @@ const ManagementPanel = () => {
     const relatedFields = {
       country: 'continent',
       constructor: 'country',
-      chassis: 'constructor',
       circuit: 'country',
       driver: ['country_of_birth', 'nationality'],
-      engine: 'manufacturer',
-      engine_manufacturer: 'country',
-      tyre_manufacturer: 'country',
       race: 'circuit',
       constructor_standing: ['constructor', 'race'],
       driver_standing: ['driver', 'race'],

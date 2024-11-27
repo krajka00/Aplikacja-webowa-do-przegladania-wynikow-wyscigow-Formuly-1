@@ -70,37 +70,6 @@ class Driver(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-
-class EngineManufacturer(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-class Engine(models.Model):
-    name = models.CharField(max_length=100)
-    full_name = models.CharField(max_length=200)
-    manufacturer = models.ForeignKey(EngineManufacturer, on_delete=models.CASCADE)
-    capacity = models.FloatField()
-    configuration = models.CharField(max_length=50)
-    aspiration = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.full_name
-
-class Entrant(models.Model):
-    name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
-
-class TyreManufacturer(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
     
 class Race(models.Model):
     season = models.IntegerField()
@@ -131,14 +100,6 @@ class RaceResult(models.Model):
 
     def __str__(self):
         return f"{self.race} - {self.driver} - Position: {self.position}"
-
-class StartingGrid(models.Model):
-    race = models.ForeignKey(Race, on_delete=models.CASCADE)
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    position = models.IntegerField()
-
-    def __str__(self):
-        return f"{self.race} - {self.driver} - Grid Position: {self.position}"
 
 class DriverStanding(models.Model):
     race = models.ForeignKey(Race, on_delete=models.CASCADE)
@@ -219,13 +180,6 @@ class SprintRaceResult(models.Model):
     interval = models.CharField(max_length=20, null=True, blank=True)
     reason_retired = models.CharField(max_length=200, null=True, blank=True)
     points = models.IntegerField()
-
-class SprintStartingGrid(models.Model):
-    race = models.ForeignKey('Race', on_delete=models.CASCADE)
-    driver = models.ForeignKey('Driver', on_delete=models.CASCADE)
-    position = models.IntegerField()
-    grid_penalty = models.CharField(max_length=200, null=True, blank=True)
-    time = models.CharField(max_length=20, null=True, blank=True)
 
 class QualifyingResult(models.Model):
     race = models.ForeignKey(Race, on_delete=models.CASCADE)
