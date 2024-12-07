@@ -16,7 +16,7 @@ const ManagementPanel = () => {
 
   const categories = [
     'continent', 'country', 'constructor', 'circuit', 'driver', 'constructor_standing', 'driver_standing',
-    'race', 'race_result', 'fastest_lap', 'pit_stop', 'qualifying_result', 'sprint_qualifying_result',
+    'race', 'race_result', 'fastest_lap', 'qualifying_result', 'sprint_qualifying_result',
     'sprint_race_result', 'practice_session'
   ];
 
@@ -94,7 +94,6 @@ const ManagementPanel = () => {
       driver_standing: ['driver', 'race', 'position', 'points'],
       race: ['official_name', 'season', 'round', 'date', 'circuit', 'laps', 'distance', 'course_length'],
       fastest_lap: ['race', 'driver', 'constructor', 'lap', 'lap_time', 'gap', 'interval'],
-      pit_stop: ['race', 'driver', 'stop_number', 'lap', 'duration', 'time_of_day'],
       qualifying_result: ['race', 'driver', 'constructor', 'position', 'q1_time', 'q2_time', 'q3_time', 'laps', 'gap', 'interval'],
       sprint_qualifying_result: ['race', 'driver', 'constructor', 'position', 'q1_time', 'q2_time', 'q3_time', 'laps', 'gap', 'interval'],
       sprint_race_result: ['race', 'driver', 'constructor', 'position', 'laps', 'time', 'time_penalty', 'gap', 'interval', 'reason_retired', 'points'],
@@ -114,7 +113,6 @@ const ManagementPanel = () => {
       constructor_standing: ['constructor', 'race'],
       driver_standing: ['driver', 'race'],
       fastest_lap: ['race', 'driver', 'constructor'],
-      pit_stop: ['race', 'driver'],
       qualifying_result: ['race', 'driver', 'constructor'],
       sprint_qualifying_result: ['race', 'driver', 'constructor'],
       sprint_race_result: ['race', 'driver', 'constructor'],
@@ -209,7 +207,7 @@ const ManagementPanel = () => {
                     `Wyścig: ${relatedData.race?.find(r => r.id === item.race)?.official_name || item.race}, Konstruktor: ${relatedData.constructor?.find(c => c.id === item.constructor)?.name || item.constructor}` :
                    selectedCategory === 'driver_standing' ?
                     `Wyścig: ${relatedData.race?.find(r => r.id === item.race)?.official_name || item.race}, Kierowca: ${relatedData.driver?.find(d => d.id === item.driver)?.first_name + ' ' + relatedData.driver?.find(d => d.id === item.driver)?.last_name || item.driver}` :
-                   ['pit_stop', 'qualifying_result', 'sprint_qualifying_result', 'sprint_race_result', 'practice_session', 'race_result', 'fastest_lap'].includes(selectedCategory) ?
+                   ['qualifying_result', 'sprint_qualifying_result', 'sprint_race_result', 'practice_session', 'race_result', 'fastest_lap'].includes(selectedCategory) ?
                     `Wyścig: ${relatedData.race?.find(r => r.id === item.race)?.official_name || item.race}, Kierowca: ${relatedData.driver?.find(d => d.id === item.driver)?.first_name + ' ' + relatedData.driver?.find(d => d.id === item.driver)?.last_name || item.driver}` :
                    item.first_name && item.last_name ? `${item.first_name} ${item.last_name}` : item.name || item.official_name || item.full_name}
                 </option>

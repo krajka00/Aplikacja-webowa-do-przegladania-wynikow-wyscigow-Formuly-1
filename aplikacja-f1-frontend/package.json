@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^13.16.1",
     "node-polyfill-webpack-plugin": "^4.0.0",
     "react-app-rewired": "^2.2.1"
   }

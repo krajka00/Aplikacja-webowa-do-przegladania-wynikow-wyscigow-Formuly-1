@@ -8,13 +8,13 @@ from rest_framework.authentication import BasicAuthentication
 from django.contrib.auth.models import User
 
 from .serializers import UserRegistrationSerializer, CommentSerializer
-from .models import (Comment, Continent, Country, Constructor, Chassis, Circuit, Driver,
-                    Race, RaceResult,DriverStanding, ConstructorStanding, FastestLap, PitStop,
+from .models import (Comment, Continent, Country, Constructor, Circuit, Driver,
+                    Race, RaceResult,DriverStanding, ConstructorStanding, FastestLap,
                     PracticeSession, SprintQualifyingResult, SprintRaceResult,QualifyingResult
 )
-from WynikiF1.models import DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, PracticeSession, SprintRaceResult, SprintQualifyingResult, SprintRaceResult, PracticeSession
+from WynikiF1.models import DriverStanding, ConstructorStanding, Race, FastestLap, QualifyingResult, PracticeSession, SprintRaceResult, SprintQualifyingResult, SprintRaceResult, PracticeSession
 from WynikiF1.serializers import(DriverStandingSerializer, ConstructorStandingSerializer, RaceSerializer,
-                                FastestLapSerializer, PitStopSerializer, QualifyingResultSerializer, SprintQualifyingResultSerializer, SprintRaceResultSerializer, PracticeSessionSerializer,
+                                FastestLapSerializer, QualifyingResultSerializer, SprintQualifyingResultSerializer, SprintRaceResultSerializer, PracticeSessionSerializer,
                                 ContinentSerializer, CountrySerializer, ConstructorSerializer, CircuitSerializer, DriverSerializer, RaceResultSerializer,
 )
 from django.urls import path
@@ -185,18 +185,6 @@ class RaceDetailsView(APIView):
                 for lap in fastest_laps
             ]
             
-            pit_stops = PitStop.objects.filter(race=race).order_by('stop_number')
-            pit_stops_data = [
-                {
-                    'driver': f"{stop.driver.first_name} {stop.driver.last_name}",
-                    'stop_number': stop.stop_number,
-                    'lap': stop.lap,
-                    'duration': stop.duration,
-                    'time_of_day': stop.time_of_day
-                }
-                for stop in pit_stops
-            ]
-            
             qualifying_results = QualifyingResult.objects.filter(race=race).order_by('position')
             qualifying_data = [
                 {
@@ -265,7 +253,6 @@ class RaceDetailsView(APIView):
                 'race_details': race_details,
                 'results': results_data,
                 'fastest_laps': fastest_laps_data,
-                'pit_stops': pit_stops_data,
                 'qualifying_results': qualifying_data,
                 'sprint_qualifying_results': sprint_qualifying_data,
                 'sprint_results': sprint_results_data,
@@ -305,19 +292,6 @@ class FastestLapListView(ListAPIView):
             queryset = queryset.filter(driver_id=driver)
         if constructor:
             queryset = queryset.filter(constructor_id=constructor)
-        return queryset
-
-class PitStopListView(ListAPIView):
-    serializer_class = PitStopSerializer
-
-    def get_queryset(self):
-        queryset = PitStop.objects.all()
-        race = self.request.query_params.get('race')
-        driver = self.request.query_params.get('driver')
-        if race:
-            queryset = queryset.filter(race_id=race)
-        if driver:
-            queryset = queryset.filter(driver_id=driver)
         return queryset
 
 class QualifyingResultListView(ListAPIView):
@@ -408,29 +382,6 @@ class FastestLapDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
-
-class PitStopCreateView(CreateAPIView):
-    queryset = PitStop.objects.all()
-    serializer_class = PitStopSerializer
-
-    def perform_create(self, serializer):
-        race = self.request.data.get('race')
-        driver = self.request.data.get('driver')
-        serializer.save(race_id=race, driver_id=driver)
-
-class PitStopUpdateView(UpdateAPIView):
-    queryset = PitStop.objects.all()
-    serializer_class = PitStopSerializer
-
-    def perform_update(self, serializer):
-        race = self.request.data.get('race')
-        driver = self.request.data.get('driver')
-        serializer.save(race_id=race, driver_id=driver)
-
-class PitStopDeleteView(DestroyAPIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    queryset = PitStop.objects.all()
-    serializer_class = PitStopSerializer
 
 class QualifyingResultCreateView(CreateAPIView):
     queryset = QualifyingResult.objects.all()
@@ -778,16 +729,6 @@ class FastestLapRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
-
-class PitStopRetrieveView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = PitStop.objects.all()
-    serializer_class = PitStopSerializer
-
-class PitStopListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = PitStop.objects.all()
-    serializer_class = PitStopSerializer
 
 class QualifyingResultRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]

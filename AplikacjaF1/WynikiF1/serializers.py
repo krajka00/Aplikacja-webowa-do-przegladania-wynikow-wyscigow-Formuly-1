@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Comment
-from WynikiF1.models import (DriverStanding, ConstructorStanding, Race, FastestLap, PitStop, QualifyingResult, SprintQualifyingResult, SprintRaceResult, PracticeSession,
- Comment, Continent, Country, Constructor, Chassis, Circuit, Driver, RaceResult)
+from WynikiF1.models import (DriverStanding, ConstructorStanding, Race, FastestLap, QualifyingResult, SprintQualifyingResult, SprintRaceResult, PracticeSession,
+ Comment, Continent, Country, Constructor, Circuit, Driver, RaceResult)
 from django.contrib.auth.models import Group
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -53,11 +53,6 @@ class FastestLapSerializer(serializers.ModelSerializer):
     class Meta:
         model = FastestLap
         fields = ['id', 'race', 'driver', 'constructor', 'lap', 'lap_time', 'gap', 'interval']
-
-class PitStopSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PitStop
-        fields = ['id', 'race', 'driver', 'stop_number', 'lap', 'duration', 'time_of_day']
 
 class QualifyingResultSerializer(serializers.ModelSerializer):
     class Meta:

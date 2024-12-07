@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import(UserRegistrationView, LogoutView, CurrentStandingsView, RaceDetailsView, RaceUpdateView, DriverStandingUpdateView, ConstructorStandingUpdateView,
-                    FastestLapUpdateView, FastestLapCreateView, FastestLapDeleteView, PitStopUpdateView, PitStopCreateView, PitStopDeleteView,QualifyingResultUpdateView, QualifyingResultCreateView, 
+                    FastestLapUpdateView, FastestLapCreateView, FastestLapDeleteView,QualifyingResultUpdateView, QualifyingResultCreateView, 
                     QualifyingResultDeleteView, SprintQualifyingResultUpdateView, SprintQualifyingResultCreateView, SprintQualifyingResultDeleteView, SprintRaceResultUpdateView,
                     SprintRaceResultCreateView, SprintRaceResultDeleteView, PracticeSessionUpdateView, PracticeSessionCreateView, PracticeSessionDeleteView, RaceUpdateView, RaceCreateView,
                     RaceDeleteView, DriverStandingUpdateView, DriverStandingCreateView, DriverStandingDeleteView, ConstructorStandingUpdateView, ConstructorStandingCreateView,
@@ -10,8 +10,7 @@ from .views import(UserRegistrationView, LogoutView, CurrentStandingsView, RaceD
                     CircuitCreateView, CircuitUpdateView, CircuitDeleteView, CircuitRetrieveView, CircuitListView,
                     DriverCreateView, DriverUpdateView, DriverDeleteView, DriverRetrieveView, DriverListView,
                     DriverStandingRetrieveView, DriverStandingListView, ConstructorStandingRetrieveView, ConstructorStandingListView,
-                    RaceRetrieveView, FastestLapRetrieveView, FastestLapListView,
-                    PitStopRetrieveView, PitStopListView, QualifyingResultRetrieveView, QualifyingResultListView,
+                    RaceRetrieveView, FastestLapRetrieveView, FastestLapListView, QualifyingResultRetrieveView, QualifyingResultListView,
                     SprintQualifyingResultRetrieveView, SprintQualifyingResultListView, SprintRaceResultRetrieveView, SprintRaceResultListView,
                     PracticeSessionRetrieveView, PracticeSessionListView, RaceResultCreateView, RaceResultListView, RaceResultUpdateView, RaceListView2, ConstructorStandingAllView, DriverStandingAllView)
 urlpatterns = [
@@ -28,11 +27,6 @@ urlpatterns = [
     path('fastest_lap/create/', FastestLapCreateView.as_view(), name='fastest_lap_create'),
     path('fastest_lap/<int:pk>/', FastestLapRetrieveView.as_view(), name='fastest_lap_retrieve'),
     path('fastest_lap/', FastestLapListView.as_view(), name='fastest_lap_list'),
-    path('pit_stop/update/<int:pk>/', PitStopUpdateView.as_view(), name='pit_stop_update'),
-    path('pit_stop/delete/<int:pk>/', PitStopDeleteView.as_view(), name='pit_stop_delete'),
-    path('pit_stop/create/', PitStopCreateView.as_view(), name='pit_stop_create'),
-    path('pit_stop/<int:pk>/', PitStopRetrieveView.as_view(), name='pit_stop_retrieve'),
-    path('pit_stop/', PitStopListView.as_view(), name='pit_stop_list'),
     path('qualifying_result/update/<int:pk>/', QualifyingResultUpdateView.as_view(), name='qualifying_result_update'),
     path('qualifying_result/delete/<int:pk>/', QualifyingResultDeleteView.as_view(), name='qualifying_result_delete'),
     path('qualifying_result/create/', QualifyingResultCreateView.as_view(), name='qualifying_result_create'),

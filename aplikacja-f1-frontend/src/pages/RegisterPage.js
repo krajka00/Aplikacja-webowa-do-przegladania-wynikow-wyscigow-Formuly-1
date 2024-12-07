@@ -33,7 +33,7 @@ const RegisterPage = () => {
       <form onSubmit={handleRegister} className="register-form">
         <h2>Rejestracja</h2>
         <div className="form-group">
-          <label>Username:</label>
+          <label>Login:</label>
           <input
             type="text"
             value={username}
@@ -51,7 +51,7 @@ const RegisterPage = () => {
           />
         </div>
         <div className="form-group">
-          <label>Password:</label>
+          <label>Hasło:</label>
           <input
             type="password"
             value={password}

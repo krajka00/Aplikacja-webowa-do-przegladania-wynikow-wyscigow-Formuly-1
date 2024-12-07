@@ -35,14 +35,7 @@ class Constructor(models.Model):
 
     def __str__(self):
         return f"{self.full_name} ({self.name})"
-    
-class Chassis(models.Model):
-    name = models.CharField(max_length=100)
-    full_name = models.CharField(max_length=200)
-    constructor = models.ForeignKey(Constructor, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"{self.full_name} ({self.name})"
     
 class Circuit(models.Model):
     name = models.CharField(max_length=100)
@@ -130,17 +123,6 @@ class FastestLap(models.Model):
 
     def __str__(self):
         return f"{self.race} - {self.driver} - Lap: {self.lap} - Time: {self.lap_time}"
-
-class PitStop(models.Model):
-    race = models.ForeignKey(Race, on_delete=models.CASCADE)
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    stop_number = models.IntegerField()
-    lap = models.IntegerField()
-    duration = models.CharField(max_length=50)
-    time_of_day = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.race} - {self.driver} - Pit Stop #{self.stop_number}"
     
 class PracticeSession(models.Model):
     race = models.ForeignKey(Race, on_delete=models.CASCADE)
