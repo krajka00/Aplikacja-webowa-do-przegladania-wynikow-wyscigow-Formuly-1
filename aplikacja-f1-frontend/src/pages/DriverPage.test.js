@@ -69,7 +69,6 @@ describe('DriverPage Component', () => {
       </MemoryRouter>
     );
 
-    // Sprawdź dane kierowcy
     await waitFor(() => {
       expect(screen.getByText(/Szczegóły Kierowcy:/i)).toHaveTextContent('Max Verstappen');
     });
@@ -82,7 +81,6 @@ describe('DriverPage Component', () => {
     expect(screen.getByText(/Kraj urodzenia:/i).parentElement).toHaveTextContent('Holandia');
     expect(screen.getByText(/Narodowość:/i).parentElement).toHaveTextContent('Holender');
 
-    // Sprawdź tabelę wyników
     await waitFor(() => {
       expect(screen.getByText(/Bahrain Grand Prix/i)).toBeInTheDocument();
       expect(screen.getByText(/Saudi Arabian Grand Prix/i)).toBeInTheDocument();

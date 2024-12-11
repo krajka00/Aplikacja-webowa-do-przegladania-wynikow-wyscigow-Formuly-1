@@ -9,21 +9,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class RaceAppViewsTestCase(APITestCase):
     def setUp(self):
-        # Setting up initial data for testing
         self.client = APIClient()
 
-        # Create groups for permission checks
         self.user_group = Group.objects.create(name='User')
         self.moderator_group = Group.objects.create(name='Moderator')
 
-        # Create a user and assign group
         self.user = User.objects.create_user(username="testuser", password="password123")
         self.user.groups.add(self.user_group)
 
-        # Create another user for admin actions
         self.admin_user = User.objects.create_superuser(username="adminuser", password="adminpassword")
 
-        # Create some basic objects
         self.continent = Continent.objects.create(code="EU", name="Europe", demonym="European")
         self.country = Country.objects.create(name="Italy", alpha2_code="IT", alpha3_code="ITA", demonym="Italian", continent=self.continent)
         self.constructor = Constructor.objects.create(name="Ferrari", full_name="Scuderia Ferrari", country=self.country)
@@ -32,31 +27,26 @@ class RaceAppViewsTestCase(APITestCase):
         self.race = Race.objects.create(season=2023, round=14, date="2023-09-03", official_name="Italian Grand Prix", qualifying_format="Standard", circuit=self.circuit, course_length=5.793, laps=53, distance=306.72)
 
     def authenticate_user(self):
-        # Authenticate the user using JWT
         refresh = RefreshToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
     def authenticate_admin(self):
-        # Authenticate the admin user using JWT
         refresh = RefreshToken.for_user(self.admin_user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
 
     def test_user_registration_view(self):
-        # Testing User Registration
         data = {"username": "newuser", "email": "newuser@example.com", "password": "newpassword123"}
         response = self.client.post("/api/register/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["username"], "newuser")
 
     def test_logout_view(self):
-        # Testing Logout View
         self.authenticate_user()
         refresh = RefreshToken.for_user(self.user)
         response = self.client.post("/api/logout/", {"refresh": str(refresh)})
         self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
 
     def test_comment_create_view(self):
-        # Testing Comment Creation
         self.authenticate_user()
         url = f"/api/races/{self.race.id}/comments/create/"
         data = {"content": "Great race!"}
@@ -65,7 +55,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["content"], "Great race!")
 
     def test_comment_delete_view_as_moderator(self):
-        # Testing Comment Deletion by Moderator
         self.authenticate_admin()
         comment = Comment.objects.create(race=self.race, user=self.user, content="This is a comment")
         url = f"/api/races/{self.race.id}/comments/delete/{comment.id}/"
@@ -73,7 +62,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_current_standings_view(self):
-        # Testing Current Standings View
         DriverStanding.objects.create(race=self.race, driver=self.driver, position=1, points=25)
         ConstructorStanding.objects.create(race=self.race, constructor=self.constructor, position=1, points=43)
         response = self.client.get("/api/standings/current/")
@@ -83,21 +71,18 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(len(response.data["constructor_standings"]), 1)
 
     def test_race_details_view(self):
-        # Testing Race Details View
         url = f"/api/races/{self.race.id}/"
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["race_details"]["official_name"], "Italian Grand Prix")
 
     def test_race_list_view(self):
-        # Testing Race List for a specific year
         response = self.client.get(f"/api/races/all/{self.race.season}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["official_name"], "Italian Grand Prix")
 
     def test_qualifying_result_create_view(self):
-        # Testing Qualifying Result Creation
         refresh = RefreshToken.for_user(self.admin_user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
         url = f"/api/qualifying_result/create/"
@@ -116,7 +101,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_qualifying_result_update_view(self):
-        # Testing Qualifying Result Update
         refresh = RefreshToken.for_user(self.admin_user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
         qualifying_result = QualifyingResult.objects.create(
@@ -145,7 +129,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_fastest_lap_create_view(self):
-        # Testing Fastest Lap Creation
         self.authenticate_user()
         url = f"/api/fastest_lap/create/"
         data = {
@@ -160,7 +143,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["lap"], 53)
 
     def test_fastest_lap_update_view(self):
-        # Testing Fastest Lap Update
         self.authenticate_user()
         fastest_lap = FastestLap.objects.create(
             race=self.race,
@@ -182,7 +164,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["lap"], 54)
 
     def test_constructor_standing_create_view(self):
-        # Testing Constructor Standing Creation
         self.authenticate_user()
         url = f"/api/constructor_standing/create/"
         data = {
@@ -196,7 +177,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_constructor_standing_update_view(self):
-        # Testing Constructor Standing Update
         self.authenticate_user()
         constructor_standing = ConstructorStanding.objects.create(
             race=self.race,
@@ -216,7 +196,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_race_result_create_view(self):
-        # Testing Race Result Creation
         self.authenticate_user()
         url = f"/api/race_result/create/"
         data = {
@@ -233,7 +212,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_race_result_update_view(self):
-        # Testing Race Result Update
         self.authenticate_user()
         race_result = RaceResult.objects.create(
             race=self.race,
@@ -259,7 +237,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
     
     def test_practice_session_create_view(self):
-        # Testing Practice Session Creation
         self.authenticate_user()
         url = f"/api/practice_session/create/"
         data = {
@@ -276,7 +253,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_practice_session_update_view(self):
-        # Testing Practice Session Update
         self.authenticate_user()
         practice_session = PracticeSession.objects.create(
             race=self.race,
@@ -302,7 +278,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_sprint_race_result_create_view(self):
-        # Testing Sprint Race Result Creation
         self.authenticate_user()
         url = f"/api/sprint_race_result/create/"
         data = {
@@ -319,7 +294,6 @@ class RaceAppViewsTestCase(APITestCase):
         self.assertEqual(response.data["position"], 1)
 
     def test_sprint_race_result_update_view(self):
-        # Testing Sprint Race Result Update
         self.authenticate_user()
         sprint_race_result = SprintRaceResult.objects.create(
             race=self.race,

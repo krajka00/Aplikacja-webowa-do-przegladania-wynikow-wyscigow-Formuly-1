@@ -92,7 +92,6 @@ const HomePage = () => {
         </div>
 
         <div className="tables-container">
-          {/* Tabela kierowców */}
           <div className="table-half">
             <h2>Aktualna Tabela Kierowców</h2>
             <table>
@@ -119,7 +118,6 @@ const HomePage = () => {
             </table>
           </div>
 
-          {/* Tabela konstruktorów */}
           <div className="table-half">
             <h2>Aktualna Tabela Konstruktorów</h2>
             <table>

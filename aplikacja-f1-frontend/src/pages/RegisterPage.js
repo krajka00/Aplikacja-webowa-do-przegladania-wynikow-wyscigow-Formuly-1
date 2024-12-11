@@ -62,10 +62,8 @@ const RegisterPage = () => {
         <button type="submit" className="register-button">Zarejestruj się</button>
       </form>
 
-      {/* Wyświetlenie wiadomości o błędzie lub sukcesie poniżej formularza */}
       {message && <div className="register-message">{message}</div>}
 
-      {/* Przycisk do przekierowania na stronę logowania */}
       <div className="redirect-login">
         <p>Masz już konto? <Link to="/login">Zaloguj się</Link></p>
       </div>

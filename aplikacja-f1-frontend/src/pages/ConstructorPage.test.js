@@ -62,12 +62,10 @@ describe('ConstructorPage Component', () => {
       </MemoryRouter>
     );
 
-    // Debug: Sprawdź, co jest renderowane
     await waitFor(() => {
       console.log('DEBUG DOM:', screen.getByText(/Pełna nazwa:/i).parentElement.innerHTML);
     });
 
-    // Sprawdź szczegóły konstruktora
     await waitFor(() => {
       const fullNameElement = screen.getByText(/Pełna nazwa:/i).parentElement;
       expect(fullNameElement).toHaveTextContent('Oracle Red Bull Racing');
@@ -78,7 +76,6 @@ describe('ConstructorPage Component', () => {
       expect(countryElement).toHaveTextContent('Austria');
     });
 
-    // Sprawdź tabelę wyników
     await waitFor(() => {
       expect(screen.getByText(/Bahrain Grand Prix/i)).toBeInTheDocument();
       expect(screen.getByText(/Saudi Arabian Grand Prix/i)).toBeInTheDocument();

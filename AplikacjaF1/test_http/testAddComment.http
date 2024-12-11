@@ -1,9 +1,0 @@
-### Dodawanie komentarza
-POST http://127.0.0.1:8000/api/comments/
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMTI5MTM0LCJpYXQiOjE3MzIxMjU1MzQsImp0aSI6ImM0Njc2ODU1YjBmMzQ1NmU4MmE3OTY1ZTlmZjg3MmM3IiwidXNlcl9pZCI6Mn0.J2D10ZPMVcZnNUGikxFhRLVU7O58puDNadkGYzjWmEE
-
-{
-  "race": 1,
-  "content": "Świetny wyścig, emocje były ogromne!"
-}

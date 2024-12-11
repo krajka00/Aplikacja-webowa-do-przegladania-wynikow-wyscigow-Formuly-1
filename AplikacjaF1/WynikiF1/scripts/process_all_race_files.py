@@ -1,12 +1,8 @@
 import os
 
-# Ścieżka do katalogu z wyścigami
 RACES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'yaml_data', 'seasons', '2023', 'races')
 
 def replace_dash_with_space_in_lines_with_id(file_path):
-    """
-    Funkcja zamieniająca "-" na spację w linii, które zawierają ciąg "Id".
-    """
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
@@ -21,13 +17,9 @@ def replace_dash_with_space_in_lines_with_id(file_path):
         file.writelines(modified_lines)
 
 def process_all_race_files():
-    """
-    Funkcja przechodząca przez wszystkie pliki YAML w katalogu z wyścigami i zamieniająca "-" na spację w odpowiednich liniach.
-    """
     for race_folder in os.listdir(RACES_DIR):
         race_path = os.path.join(RACES_DIR, race_folder)
         if os.path.isdir(race_path):
-            # Przetwarzanie wszystkich plików YAML w folderze wyścigu
             for file_name in os.listdir(race_path):
                 if file_name.endswith('.yml'):
                     file_path = os.path.join(race_path, file_name)

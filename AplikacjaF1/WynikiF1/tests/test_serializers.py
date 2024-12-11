@@ -14,7 +14,6 @@ from WynikiF1.serializers import (
 
 class SerializerTests(TestCase):
     def setUp(self):
-        # Create basic data for testing
         self.continent = Continent.objects.create(code="EU", name="Europe", demonym="European")
         self.country = Country.objects.create(
             name="Italy", alpha2_code="IT", alpha3_code="ITA", demonym="Italian", continent=self.continent

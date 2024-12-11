@@ -78,25 +78,21 @@ describe('HomePage Component', () => {
       </MemoryRouter>
     );
 
-    // Verify race list
     await waitFor(() => {
       expect(screen.getByText('Bahrain Grand Prix')).toBeInTheDocument();
       expect(screen.getByText('Saudi Arabian Grand Prix')).toBeInTheDocument();
     });
 
-    // Verify driver standings
     await waitFor(() => {
       expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
       expect(screen.getByText('Lewis Hamilton')).toBeInTheDocument();
     });
 
-    // Verify constructor standings
     await waitFor(() => {
       expect(screen.getByText('Red Bull Racing')).toBeInTheDocument();
       expect(screen.getByText('Mercedes')).toBeInTheDocument();
     });
 
-    // Verify API calls
     expect(axios.get).toHaveBeenCalledWith('http://127.0.0.1:8000/api/races/all/2023');
     expect(axios.get).toHaveBeenCalledWith('http://127.0.0.1:8000/api/standings/current/');
   });

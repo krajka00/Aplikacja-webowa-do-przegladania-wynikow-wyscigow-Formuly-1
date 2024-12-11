@@ -359,6 +359,7 @@ class PracticeSessionListView(ListAPIView):
         return queryset
 
 class FastestLapCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
 
@@ -369,6 +370,7 @@ class FastestLapCreateView(CreateAPIView):
         serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class FastestLapUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = FastestLap.objects.all()
     serializer_class = FastestLapSerializer
 
@@ -394,6 +396,7 @@ class QualifyingResultCreateView(CreateAPIView):
         serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class QualifyingResultUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = QualifyingResult.objects.all()
     serializer_class = QualifyingResultSerializer
 
@@ -409,6 +412,7 @@ class QualifyingResultDeleteView(DestroyAPIView):
     serializer_class = QualifyingResultSerializer
 
 class SprintQualifyingResultCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintQualifyingResult.objects.all()
     serializer_class = SprintQualifyingResultSerializer
 
@@ -419,6 +423,7 @@ class SprintQualifyingResultCreateView(CreateAPIView):
         serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class SprintQualifyingResultUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintQualifyingResult.objects.all()
     serializer_class = SprintQualifyingResultSerializer
 
@@ -434,6 +439,7 @@ class SprintQualifyingResultDeleteView(DestroyAPIView):
     serializer_class = SprintQualifyingResultSerializer
 
 class SprintRaceResultCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintRaceResult.objects.all()
     serializer_class = SprintRaceResultSerializer
 
@@ -444,6 +450,7 @@ class SprintRaceResultCreateView(CreateAPIView):
         serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class SprintRaceResultUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintRaceResult.objects.all()
     serializer_class = SprintRaceResultSerializer
 
@@ -455,10 +462,12 @@ class SprintRaceResultUpdateView(UpdateAPIView):
 
 class SprintRaceResultDeleteView(DestroyAPIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = SprintRaceResult.objects.all()
     serializer_class = SprintRaceResultSerializer
 
 class PracticeSessionCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = PracticeSession.objects.all()
     serializer_class = PracticeSessionSerializer
 
@@ -469,6 +478,7 @@ class PracticeSessionCreateView(CreateAPIView):
         serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class PracticeSessionUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = PracticeSession.objects.all()
     serializer_class = PracticeSessionSerializer
 
@@ -771,6 +781,7 @@ class PracticeSessionListView(ListAPIView):
     serializer_class = PracticeSessionSerializer
 
 class RaceResultCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = RaceResult.objects.all()
     serializer_class = RaceResultSerializer
 
@@ -781,6 +792,7 @@ class RaceResultCreateView(CreateAPIView):
         serializer.save(race_id=race, driver_id=driver, constructor_id=constructor)
 
 class RaceResultUpdateView(UpdateAPIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
     queryset = RaceResult.objects.all()
     serializer_class = RaceResultSerializer
 

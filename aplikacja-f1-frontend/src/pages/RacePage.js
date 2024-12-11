@@ -335,7 +335,6 @@ const RacePage = () => {
           <p><strong>Dystans:</strong> {raceDetails.race_details.distance} km</p>
         </div>
 
-        {/* Kafelki do przełączania sekcji */}
         <div className="stats-menu">
           {raceDetails.results && raceDetails.results.length > 0 && (
             <div className="stat-card" onClick={() => toggleSection('results')}>
@@ -374,7 +373,6 @@ const RacePage = () => {
             ))}
         </div>
 
-        {/* Renderowanie zawartości sekcji */}
         {renderSectionContent()}
 
         <div className="comments-section">

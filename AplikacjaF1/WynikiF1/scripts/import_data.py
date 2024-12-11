@@ -49,7 +49,6 @@ def get_tyre_manufacturer(tyre_manufacturer_id):
         print(f"Nie znaleziono producenta opon: {tyre_manufacturer_id}")
     return tyre_manufacturer
 
-# Import danych dla Starting Grid
 def import_starting_grid(race, file_path):
     print(f"Importowanie Starting Grid dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -108,7 +107,6 @@ def import_race_results(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy lub konstruktora dla wyniku: {entry}')
 
-# Import danych dla Constructor Standings
 def import_constructor_standings(race, file_path):
     print(f"Importowanie standings konstruktorów dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -128,7 +126,6 @@ def import_constructor_standings(race, file_path):
         else:
             print(f'Nie udało się znaleźć konstruktora dla standings: {entry}')
 
-# Import danych dla Driver Standings
 def import_driver_standings(race, file_path):
     print(f"Importowanie standings kierowców dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -148,7 +145,6 @@ def import_driver_standings(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy dla standings: {entry}')
 
-# Import danych dla Fastest Laps
 def import_fastest_laps(race, file_path):
     print(f"Importowanie najszybszych okrążeń dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -170,7 +166,6 @@ def import_fastest_laps(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy dla najszybszego okrążenia: {entry}')
 
-# Import danych dla Pit Stops
 def import_pit_stops(race, file_path):
     print(f"Importowanie pit stopów dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -191,7 +186,6 @@ def import_pit_stops(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy dla pit stopu: {entry}')
 
-# Import danych dla Practice Sessions
 def import_practice_sessions(race, file_path, session_number):
     print(f"Importowanie wyników sesji treningowej (Practice {session_number}) dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -217,7 +211,6 @@ def import_practice_sessions(race, file_path, session_number):
         else:
             print(f'Nie udało się znaleźć kierowcy lub konstruktora dla wyniku sesji treningowej: {entry}')
 
-# Import danych dla Sprint Qualifying
 def import_sprint_qualifying(race, file_path):
     print(f"Importowanie wyników kwalifikacji sprintu dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -252,7 +245,6 @@ def import_sprint_qualifying(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy dla wyniku kwalifikacji sprintu: {entry}')
 
-# Import danych dla Sprint Race
 def import_sprint_race(race, file_path):
     print(f"Importowanie wyników wyścigu sprintowego dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -291,7 +283,6 @@ def import_sprint_race(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy lub konstruktora dla wyniku sprintu: {entry}')
 
-# Import danych dla Sprint Starting Grid
 def import_sprint_starting_grid(race, file_path):
     print(f"Importowanie pozycji startowych sprintu dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -313,7 +304,6 @@ def import_sprint_starting_grid(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy dla pozycji startowej sprintu: {entry}')
 
-# Import danych dla Qualifying
 def import_qualifying(race, file_path):
     print(f"Importowanie wyników kwalifikacji dla wyścigu: {race}")
     data = load_yaml_data(file_path)
@@ -353,36 +343,29 @@ def import_qualifying(race, file_path):
         else:
             print(f'Nie udało się znaleźć kierowcy dla wyniku kwalifikacji: {entry}')
 
-# Główna funkcja importująca wszystkie dane
 def import_all_data():
-    # Iteracja przez wszystkie foldery wyścigów
     for race_folder in os.listdir(base_path):
         race_path = os.path.join(base_path, race_folder)
         if os.path.isdir(race_path):
-            # Pobranie odpowiedniego wyścigu
-            season = 2023  # Przykładowy sezon
+            season = 2023
             round_number = int(race_folder.split('-')[0])
             race = get_race(season=season, round=round_number)
             if not race:
                 print(f'Wyścig dla folderu {race_folder} nie został znaleziony.')
                 continue
 
-            # Importowanie danych sesji treningowych
             for session_num in range(1, 4):
                 practice_session_path = os.path.join(race_path, f'free-practice-{session_num}-results.yml')
                 if os.path.isfile(practice_session_path):
                     import_practice_sessions(race, practice_session_path, session_number=session_num)
-            # Importowanie danych dla Sprint Qualifying
             qualifying_path = os.path.join(race_path, 'qualifying-results.yml')
             if os.path.isfile(qualifying_path):
                 import_qualifying(race, qualifying_path)
 
-            # Importowanie danych dla  Qualifying
             sprint_qualifying_path = os.path.join(race_path, 'sprint-qualifying-results.yml')
             if os.path.isfile(sprint_qualifying_path):
                 import_sprint_qualifying(race, sprint_qualifying_path)
 
-            # Importowanie danych dla Sprint Race
             sprint_race_path = os.path.join(race_path, 'sprint-race-results.yml')
             if os.path.isfile(sprint_race_path):
                 import_sprint_race(race, sprint_race_path)
@@ -391,36 +374,29 @@ def import_all_data():
             if os.path.isfile(sprint_starting_grid_path):
                 import_sprint_starting_grid(race, sprint_starting_grid_path)
 
-            # Importowanie Starting Grid
             starting_grid_path = os.path.join(race_path, 'starting-grid-positions.yml')
             if os.path.isfile(starting_grid_path):
                 import_starting_grid(race, starting_grid_path)
 
-            # Importowanie Race Results
             race_results_path = os.path.join(race_path, 'race-results.yml')
             if os.path.isfile(race_results_path):
                 import_race_results(race, race_results_path)
 
-            # Importowanie Constructor Standings
             constructor_standings_path = os.path.join(race_path, 'constructor-standings.yml')
             if os.path.isfile(constructor_standings_path):
                 import_constructor_standings(race, constructor_standings_path)
 
-            # Importowanie Driver Standings
             driver_standings_path = os.path.join(race_path, 'driver-standings.yml')
             if os.path.isfile(driver_standings_path):
                 import_driver_standings(race, driver_standings_path)
 
-            # Importowanie Fastest Laps
             fastest_laps_path = os.path.join(race_path, 'fastest-laps.yml')
             if os.path.isfile(fastest_laps_path):
                 import_fastest_laps(race, fastest_laps_path)
 
-            # Importowanie Pit Stops
             pit_stops_path = os.path.join(race_path, 'pit-stops.yml')
             if os.path.isfile(pit_stops_path):
                 import_pit_stops(race, pit_stops_path)
 
-# Uruchomienie importu
 if __name__ == "__main__":
     import_all_data()

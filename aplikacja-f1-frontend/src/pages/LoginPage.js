@@ -51,10 +51,8 @@ const LoginPage = () => {
         <button type="submit" className="login-button">Log In</button>
       </form>
 
-      {/* Wyświetlenie wiadomości o błędzie lub sukcesie poniżej formularza */}
       {message && <div className="login-message">{message}</div>}
 
-      {/* Przycisk do przekierowania na stronę rejestracji */}
       <div className="redirect-register">
         <p>Nie masz konta? <Link to="/register">Zarejestruj się</Link></p>
       </div>

@@ -94,7 +94,6 @@ class RaceModelTest(TestCase):
 
 class CommentModelTest(TestCase):
     def setUp(self):
-        # Tworzenie użytkownika
         self.user = User.objects.create_user(username="test_user", password="testpassword")
         
         self.continent = Continent.objects.create(code="EU", name="Europe", demonym="European")
@@ -163,7 +162,6 @@ class DriverModelTest(TestCase):
 
 class DriverStandingModelTest(TestCase):
     def setUp(self):
-        # Tworzenie niezbędnych danych
         self.continent = Continent.objects.create(
             code="EU", name="Europe", demonym="European"
         )

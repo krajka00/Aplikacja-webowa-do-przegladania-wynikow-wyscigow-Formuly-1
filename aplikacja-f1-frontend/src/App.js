@@ -12,7 +12,7 @@ import ConstructorPage from './pages/ConstructorPage';
 function App() {
   return (
     <Router>
-      <Header /> {/* Dodajemy Header na górze aplikacji */}
+      <Header /> 
       <div className="app-content">
         <Routes>
           <Route path="/" element={<HomePage />} />
